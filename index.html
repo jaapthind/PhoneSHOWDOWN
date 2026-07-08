@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMCAPRE - Phone Comparison</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #020617;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Liquid Glassmorphism Background */
+        .liquid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            animation: liquidFloat 25s infinite alternate ease-in-out;
+        }
+
+        .blob:nth-child(1) {
+            width: 60vw;
+            height: 60vw;
+            background: #4f46e5;
+            top: -20%;
+            left: -10%;
+        }
+
+        .blob:nth-child(2) {
+            width: 50vw;
+            height: 50vw;
+            background: #db2777;
+            bottom: -20%;
+            right: -10%;
+            animation-delay: -5s;
+        }
+
+        .blob:nth-child(3) {
+            width: 40vw;
+            height: 40vw;
+            background: #0ea5e9;
+            top: 30%;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        @keyframes liquidFloat {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+            50% { transform: translate(10vw, 15vh) scale(1.2) rotate(180deg); border-radius: 60% 40% 30% 70% / 50% 60% 40% 60%; }
+            100% { transform: translate(-10vw, -10vh) scale(0.9) rotate(360deg); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+        }
+
+        /* Main App Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8, #e879f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-panel {
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-highlight);
+        }
+
+        /* Controls Area */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .selector-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .selector-group h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            color: var(--accent);
+        }
+
+        select {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        select:hover, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        select option {
+            background: #0f172a;
+            color: #fff;
+            padding: 10px;
+        }
+
+        /* Comparison Area */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .device-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .device-header {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .device-header h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid transparent;
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .spec-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+        }
+
+        .spec-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .spec-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: span 2;
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .controls-grid, .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            .device-header {
+                position: sticky;
+                top: 0;
+                background: rgba(15, 23, 42, 0.8);
+                backdrop-filter: blur(20px);
+                z-index: 10;
+                padding-top: 1rem;
+                border-radius: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="liquid-bg">
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>OMCAPRE</h1>
+            <p class="subtitle">Next-Gen Liquid Glassmorphism Phone Database & Comparison</p>
+        </header>
+
+        <div class="controls-grid">
+            <div class="selector-group glass glass-panel">
+                <h2>Phone 1</h2>
+                <select id="brand1">
+                    <option value="" disabled selected>Select Company</option>
+                </select>
+                <select id="model1" disabled>
+                    <option value="" disabled selected>Select Model</option>
+                </select>
+            </div>
+
+            <div class="selector-group glass glass-panel">
+                <h2>Phone 2</h2>
+                <select id="brand2">
+                    <option value="" disabled selected>Select Company</option>
+                </select>
+                <select id="model2" disabled>
+                    <option value="" disabled selected>Select Model</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="comparison-grid" id="comparison-container">
+            <div class="empty-state glass">
+                Select two phones from the dropdowns above to begin comparing specs.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MASSIVE PHONE DATABASE (EASY TO ADD: JUST ADD ONE OBJECT LINE)
+        const phoneDatabase = [
+            // APPLE (Starting from 11 Series including 12 mini)
+            { brand: "Apple", model: "iPhone 11", display: "6.1\" Liquid Retina IPS LCD, 60Hz", resolution: "828 x 1792 pixels", processor: "Apple A13 Bionic (7 nm+)", ram: "4 GB", storage: "64GB / 128GB / 256GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "3110 mAh", charging: "18W wired", os: "iOS 13 (upgradable)", weight: "194 g", price: "$499 (Launch)" },
+            { brand: "Apple", model: "iPhone 11 Pro", display: "5.8\" Super Retina XDR OLED, 60Hz", resolution: "1125 x 2436 pixels", processor: "Apple A13 Bionic (7 nm+)", ram: "4 GB", storage: "64GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (telephoto 2x) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "3046 mAh", charging: "18W wired", os: "iOS 13 (upgradable)", weight: "188 g", price: "$999 (Launch)" },
+            { brand: "Apple", model: "iPhone 11 Pro Max", display: "6.5\" Super Retina XDR OLED, 60Hz", resolution: "1242 x 2688 pixels", processor: "Apple A13 Bionic (7 nm+)", ram: "4 GB", storage: "64GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (telephoto 2x) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "3969 mAh", charging: "18W wired", os: "iOS 13 (upgradable)", weight: "226 g", price: "$1099 (Launch)" },
+            { brand: "Apple", model: "iPhone SE (2nd Gen)", display: "4.7\" Retina IPS LCD, 60Hz", resolution: "750 x 1334 pixels", processor: "Apple A13 Bionic (7 nm+)", ram: "3 GB", storage: "64GB / 128GB / 256GB", main_camera: "12 MP (wide)", selfie_camera: "7 MP", battery: "1821 mAh", charging: "18W wired", os: "iOS 13 (upgradable)", weight: "148 g", price: "$399 (Launch)" },
+            { brand: "Apple", model: "iPhone 12 mini", display: "5.4\" Super Retina XDR OLED, 60Hz", resolution: "1080 x 2340 pixels", processor: "Apple A14 Bionic (5 nm)", ram: "4 GB", storage: "64GB / 128GB / 256GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "2227 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 14 (upgradable)", weight: "135 g", price: "$699 (Launch)" },
+            { brand: "Apple", model: "iPhone 12", display: "6.1\" Super Retina XDR OLED, 60Hz", resolution: "1170 x 2532 pixels", processor: "Apple A14 Bionic (5 nm)", ram: "4 GB", storage: "64GB / 128GB / 256GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "2815 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 14 (upgradable)", weight: "164 g", price: "$799 (Launch)" },
+            { brand: "Apple", model: "iPhone 12 Pro", display: "6.1\" Super Retina XDR OLED, 60Hz", resolution: "1170 x 2532 pixels", processor: "Apple A14 Bionic (5 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (telephoto 2x) + 12 MP (ultrawide) + TOF 3D LiDAR", selfie_camera: "12 MP (wide)", battery: "2815 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 14 (upgradable)", weight: "189 g", price: "$999 (Launch)" },
+            { brand: "Apple", model: "iPhone 12 Pro Max", display: "6.7\" Super Retina XDR OLED, 60Hz", resolution: "1284 x 2778 pixels", processor: "Apple A14 Bionic (5 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (telephoto 2.5x) + 12 MP (ultrawide) + TOF 3D LiDAR", selfie_camera: "12 MP (wide)", battery: "3687 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 14 (upgradable)", weight: "228 g", price: "$1099 (Launch)" },
+            { brand: "Apple", model: "iPhone 13 mini", display: "5.4\" Super Retina XDR OLED, 60Hz", resolution: "1080 x 2340 pixels", processor: "Apple A15 Bionic (5 nm)", ram: "4 GB", storage: "128GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "2438 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 15 (upgradable)", weight: "141 g", price: "$699 (Launch)" },
+            { brand: "Apple", model: "iPhone 13", display: "6.1\" Super Retina XDR OLED, 60Hz", resolution: "1170 x 2532 pixels", processor: "Apple A15 Bionic (5 nm)", ram: "4 GB", storage: "128GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "3240 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 15 (upgradable)", weight: "174 g", price: "$799 (Launch)" },
+            { brand: "Apple", model: "iPhone 13 Pro", display: "6.1\" Super Retina XDR OLED, 120Hz ProMotion", resolution: "1170 x 2532 pixels", processor: "Apple A15 Bionic (5 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "12 MP (wide) + 12 MP (telephoto 3x) + 12 MP (ultrawide) + TOF 3D LiDAR", selfie_camera: "12 MP (wide)", battery: "3095 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 15 (upgradable)", weight: "204 g", price: "$999 (Launch)" },
+            { brand: "Apple", model: "iPhone 13 Pro Max", display: "6.7\" Super Retina XDR OLED, 120Hz ProMotion", resolution: "1284 x 2778 pixels", processor: "Apple A15 Bionic (5 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "12 MP (wide) + 12 MP (telephoto 3x) + 12 MP (ultrawide) + TOF 3D LiDAR", selfie_camera: "12 MP (wide)", battery: "4352 mAh", charging: "27W wired, 15W MagSafe", os: "iOS 15 (upgradable)", weight: "240 g", price: "$1099 (Launch)" },
+            { brand: "Apple", model: "iPhone SE (3rd Gen)", display: "4.7\" Retina IPS LCD, 60Hz", resolution: "750 x 1334 pixels", processor: "Apple A15 Bionic (5 nm)", ram: "4 GB", storage: "64GB / 128GB / 256GB", main_camera: "12 MP (wide)", selfie_camera: "7 MP", battery: "2018 mAh", charging: "20W wired", os: "iOS 15 (upgradable)", weight: "144 g", price: "$429 (Launch)" },
+            { brand: "Apple", model: "iPhone 14", display: "6.1\" Super Retina XDR OLED, 60Hz", resolution: "1170 x 2532 pixels", processor: "Apple A15 Bionic (5 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "3279 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 16 (upgradable)", weight: "172 g", price: "$799 (Launch)" },
+            { brand: "Apple", model: "iPhone 14 Plus", display: "6.7\" Super Retina XDR OLED, 60Hz", resolution: "1284 x 2778 pixels", processor: "Apple A15 Bionic (5 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "4323 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 16 (upgradable)", weight: "203 g", price: "$899 (Launch)" },
+            { brand: "Apple", model: "iPhone 14 Pro", display: "6.1\" LTPO Super Retina XDR OLED, 120Hz", resolution: "1179 x 2556 pixels", processor: "Apple A16 Bionic (4 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "48 MP (wide) + 12 MP (telephoto 3x) + 12 MP (ultrawide) + TOF 3D LiDAR", selfie_camera: "12 MP (wide)", battery: "3200 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 16 (upgradable)", weight: "206 g", price: "$999 (Launch)" },
+            { brand: "Apple", model: "iPhone 14 Pro Max", display: "6.7\" LTPO Super Retina XDR OLED, 120Hz", resolution: "1290 x 2796 pixels", processor: "Apple A16 Bionic (4 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "48 MP (wide) + 12 MP (telephoto 3x) + 12 MP (ultrawide) + TOF 3D LiDAR", selfie_camera: "12 MP (wide)", battery: "4323 mAh", charging: "27W wired, 15W MagSafe", os: "iOS 16 (upgradable)", weight: "240 g", price: "$1099 (Launch)" },
+            { brand: "Apple", model: "iPhone 15", display: "6.1\" Super Retina XDR OLED, 60Hz", resolution: "1179 x 2556 pixels", processor: "Apple A16 Bionic (4 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB", main_camera: "48 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "3349 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 17", weight: "171 g", price: "$799 (Launch)" },
+            { brand: "Apple", model: "iPhone 15 Plus", display: "6.7\" Super Retina XDR OLED, 60Hz", resolution: "1290 x 2796 pixels", processor: "Apple A16 Bionic (4 nm)", ram: "6 GB", storage: "128GB / 256GB / 512GB", main_camera: "48 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "4383 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 17", weight: "201 g", price: "$899 (Launch)" },
+            { brand: "Apple", model: "iPhone 15 Pro", display: "6.1\" LTPO Super Retina XDR OLED, 120Hz", resolution: "1179 x 2556 pixels", processor: "Apple A17 Pro (3 nm)", ram: "8 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "48 MP (wide) + 12 MP (telephoto 3x) + 12 MP (ultrawide) + TOF 3D LiDAR", selfie_camera: "12 MP (wide)", battery: "3274 mAh", charging: "20W wired, 15W MagSafe", os: "iOS 17", weight: "187 g", price: "$999 (Launch)" },
+            { brand: "Apple", model: "iPhone 15 Pro Max", display: "6.7\" LTPO Super Retina XDR OLED, 120Hz", resolution: "1290 x 2796 pixels", processor: "Apple A17 Pro (3 nm)", ram: "8 GB", storage: "256GB / 512GB / 1TB", main_camera: "48 MP (wide) + 12 MP (telephoto 5x) + 12 MP (ultrawide) + TOF 3D LiDAR", selfie_camera: "12 MP (wide)", battery: "4422 mAh", charging: "27W wired, 15W MagSafe", os: "iOS 17", weight: "221 g", price: "$1199 (Launch)" },
+          // iPhone 16 Series
+            { brand: "Apple", model: "iPhone 16", display: "6.1\" Super Retina XDR OLED, 60Hz", resolution: "1179 x 2556 pixels", processor: "Apple A18 (3 nm)", ram: "8 GB", storage: "128GB / 256GB / 512GB", main_camera: "48 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "3561 mAh", charging: "25W MagSafe, USB-C 2.0", os: "iOS 18", weight: "170 g", price: "$799 (Launch)" },
+            { brand: "Apple", model: "iPhone 16 Plus", display: "6.7\" Super Retina XDR OLED, 60Hz", resolution: "1290 x 2796 pixels", processor: "Apple A18 (3 nm)", ram: "8 GB", storage: "128GB / 256GB / 512GB", main_camera: "48 MP (wide) + 12 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "4674 mAh", charging: "25W MagSafe, USB-C 2.0", os: "iOS 18", weight: "199 g", price: "$899 (Launch)" },
+            { brand: "Apple", model: "iPhone 16 Pro", display: "6.3\" LTPO Super Retina XDR OLED, 120Hz", resolution: "1206 x 2622 pixels", processor: "Apple A18 Pro (3 nm)", ram: "8 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "48 MP (wide) + 12 MP (telephoto 5x) + 48 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "3582 mAh", charging: "25W MagSafe, USB-C 3.2", os: "iOS 18", weight: "199 g", price: "$999 (Launch)" },
+            { brand: "Apple", model: "iPhone 16 Pro Max", display: "6.9\" LTPO Super Retina XDR OLED, 120Hz", resolution: "1320 x 2868 pixels", processor: "Apple A18 Pro (3 nm)", ram: "8 GB", storage: "256GB / 512GB / 1TB", main_camera: "48 MP (wide) + 12 MP (telephoto 5x) + 48 MP (ultrawide)", selfie_camera: "12 MP (wide)", battery: "4685 mAh", charging: "25W MagSafe, USB-C 3.2", os: "iOS 18", weight: "227 g", price: "$1199 (Launch)" },
+            { brand: "Apple", model: "iPhone 16e", display: "6.1\" Super Retina XDR OLED, 60Hz", resolution: "1170 x 2532 pixels", processor: "Apple A18 (3 nm)", ram: "8 GB", storage: "128GB / 256GB / 512GB", main_camera: "48 MP (wide)", selfie_camera: "12 MP (wide)", battery: "4005 mAh", charging: "Wireless, USB-C 2.0", os: "iOS 18", weight: "167 g", price: "$599 (Launch)" },
+
+            // iPhone 17 Series
+            { brand: "Apple", model: "iPhone 17", display: "6.3\" Super Retina XDR OLED, 120Hz ProMotion", resolution: "1206 x 2622 pixels", processor: "Apple A19 (3 nm)", ram: "8 GB", storage: "128GB / 256GB / 512GB", main_camera: "48 MP (wide) + 24 MP (ultrawide)", selfie_camera: "24 MP (wide)", battery: "3850 mAh", charging: "25W MagSafe, USB-C", os: "iOS 19", weight: "185 g", price: "$799 (Launch)" },
+            { brand: "Apple", model: "iPhone 17 Air", display: "6.6\" Super Retina XDR OLED, 120Hz ProMotion", resolution: "1260 x 2740 pixels", processor: "Apple A19 Pro (3 nm)", ram: "8 GB", storage: "256GB / 512GB", main_camera: "48 MP (wide)", selfie_camera: "24 MP (wide)", battery: "3200 mAh", charging: "25W MagSafe, Ultra-thin design", os: "iOS 19", weight: "160 g", price: "$999 (Launch)" },
+            { brand: "Apple", model: "iPhone 17 Pro", display: "6.3\" LTPO Super Retina XDR OLED, 120Hz", resolution: "1206 x 2622 pixels", processor: "Apple A19 Pro (3 nm)", ram: "12 GB", storage: "256GB / 512GB / 1TB", main_camera: "48 MP (wide) + 48 MP (telephoto 4x) + 48 MP (ultrawide)", selfie_camera: "18 MP (ultrawide)", battery: "3998 mAh", charging: "25W MagSafe, Vapor Chamber", os: "iOS 19", weight: "206 g", price: "$1099 (Launch)" },
+            { brand: "Apple", model: "iPhone 17 Pro Max", display: "6.9\" LTPO Super Retina XDR OLED, 120Hz", resolution: "1320 x 2868 pixels", processor: "Apple A19 Pro (3 nm)", ram: "12 GB", storage: "256GB / 512GB / 1TB / 2TB", main_camera: "48 MP (wide) + 48 MP (telephoto 4x) + 48 MP (ultrawide)", selfie_camera: "18 MP (ultrawide)", battery: "4823 mAh", charging: "25W MagSafe, Vapor Chamber", os: "iOS 19", weight: "233 g", price: "$1199 (Launch)" },
+          // iPhone X / XS / XR Series
+            { brand: "Apple", model: "iPhone XS Max", display: "6.5\" Super Retina OLED, 60Hz", resolution: "1242 x 2688 pixels", processor: "Apple A12 Bionic (7 nm)", ram: "4 GB", storage: "64GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (telephoto 2x)", selfie_camera: "7 MP", battery: "3174 mAh", charging: "15W wired, Qi wireless", os: "iOS 12 (upgradable)", weight: "208 g", price: "$1099 (Launch)" },
+            { brand: "Apple", model: "iPhone XS", display: "5.8\" Super Retina OLED, 60Hz", resolution: "1125 x 2436 pixels", processor: "Apple A12 Bionic (7 nm)", ram: "4 GB", storage: "64GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (telephoto 2x)", selfie_camera: "7 MP", battery: "2658 mAh", charging: "15W wired, Qi wireless", os: "iOS 12 (upgradable)", weight: "177 g", price: "$999 (Launch)" },
+            { brand: "Apple", model: "iPhone XR", display: "6.1\" Liquid Retina IPS LCD, 60Hz", resolution: "828 x 1792 pixels", processor: "Apple A12 Bionic (7 nm)", ram: "3 GB", storage: "64GB / 128GB / 256GB", main_camera: "12 MP (wide)", selfie_camera: "7 MP", battery: "2942 mAh", charging: "15W wired, Qi wireless", os: "iOS 12 (upgradable)", weight: "194 g", price: "$749 (Launch)" },
+            { brand: "Apple", model: "iPhone X", display: "5.8\" Super Retina OLED, 60Hz", resolution: "1125 x 2436 pixels", processor: "Apple A11 Bionic (10 nm)", ram: "3 GB", storage: "64GB / 256GB", main_camera: "12 MP (wide) + 12 MP (telephoto 2x)", selfie_camera: "7 MP", battery: "2716 mAh", charging: "15W wired, Qi wireless", os: "iOS 11 (upgradable)", weight: "174 g", price: "$999 (Launch)" },
+
+            // iPhone 8 Series
+            { brand: "Apple", model: "iPhone 8 Plus", display: "5.5\" Retina IPS LCD, 60Hz", resolution: "1080 x 1920 pixels", processor: "Apple A11 Bionic (10 nm)", ram: "3 GB", storage: "64GB / 128GB / 256GB", main_camera: "12 MP (wide) + 12 MP (telephoto 2x)", selfie_camera: "7 MP", battery: "2691 mAh", charging: "15W wired, Qi wireless", os: "iOS 11 (upgradable)", weight: "202 g", price: "$799 (Launch)" },
+            { brand: "Apple", model: "iPhone 8", display: "4.7\" Retina IPS LCD, 60Hz", resolution: "750 x 1334 pixels", processor: "Apple A11 Bionic (10 nm)", ram: "2 GB", storage: "64GB / 128GB / 256GB", main_camera: "12 MP (wide)", selfie_camera: "7 MP", battery: "1821 mAh", charging: "15W wired, Qi wireless", os: "iOS 11 (upgradable)", weight: "148 g", price: "$699 (Launch)" },
+
+            // iPhone 7 Series
+            { brand: "Apple", model: "iPhone 7 Plus", display: "5.5\" Retina IPS LCD, 60Hz", resolution: "1080 x 1920 pixels", processor: "Apple A10 Fusion (16 nm)", ram: "3 GB", storage: "32GB / 128GB / 256GB", main_camera: "12 MP (wide) + 12 MP (telephoto 2x)", selfie_camera: "7 MP", battery: "2900 mAh", charging: "Wired", os: "iOS 10 (upgradable)", weight: "188 g", price: "$769 (Launch)" },
+            { brand: "Apple", model: "iPhone 7", display: "4.7\" Retina IPS LCD, 60Hz", resolution: "750 x 1334 pixels", processor: "Apple A10 Fusion (16 nm)", ram: "2 GB", storage: "32GB / 128GB / 256GB", main_camera: "12 MP (wide)", selfie_camera: "7 MP", battery: "1960 mAh", charging: "Wired", os: "iOS 10 (upgradable)", weight: "138 g", price: "$649 (Launch)" },
+
+            // iPhone 6s & SE Series
+            { brand: "Apple", model: "iPhone SE (1st Gen)", display: "4.0\" Retina IPS LCD, 60Hz", resolution: "640 x 1136 pixels", processor: "Apple A9 (14 nm)", ram: "2 GB", storage: "16GB / 32GB / 64GB / 128GB", main_camera: "12 MP (wide)", selfie_camera: "1.2 MP", battery: "1624 mAh", charging: "Wired", os: "iOS 9.3 (upgradable)", weight: "113 g", price: "$399 (Launch)" },
+            { brand: "Apple", model: "iPhone 6s Plus", display: "5.5\" Retina IPS LCD, 60Hz", resolution: "1080 x 1920 pixels", processor: "Apple A9 (14 nm)", ram: "2 GB", storage: "16GB / 32GB / 64GB / 128GB", main_camera: "12 MP (wide)", selfie_camera: "5 MP", battery: "2750 mAh", charging: "Wired", os: "iOS 9 (upgradable)", weight: "192 g", price: "$749 (Launch)" },
+            { brand: "Apple", model: "iPhone 6s", display: "4.7\" Retina IPS LCD, 60Hz", resolution: "750 x 1334 pixels", processor: "Apple A9 (14 nm)", ram: "2 GB", storage: "16GB / 32GB / 64GB / 128GB", main_camera: "12 MP (wide)", selfie_camera: "5 MP", battery: "1715 mAh", charging: "Wired", os: "iOS 9 (upgradable)", weight: "143 g", price: "$649 (Launch)" },
+
+            // iPhone 6 Series
+            { brand: "Apple", model: "iPhone 6 Plus", display: "5.5\" Retina IPS LCD, 60Hz", resolution: "1080 x 1920 pixels", processor: "Apple A8 (20 nm)", ram: "1 GB", storage: "16GB / 64GB / 128GB", main_camera: "8 MP", selfie_camera: "1.2 MP", battery: "2915 mAh", charging: "Wired", os: "iOS 8 (upgradable)", weight: "172 g", price: "$749 (Launch)" },
+            { brand: "Apple", model: "iPhone 6", display: "4.7\" Retina IPS LCD, 60Hz", resolution: "750 x 1334 pixels", processor: "Apple A8 (20 nm)", ram: "1 GB", storage: "16GB / 32GB / 64GB / 128GB", main_camera: "8 MP", selfie_camera: "1.2 MP", battery: "1810 mAh", charging: "Wired", os: "iOS 8 (upgradable)", weight: "129 g", price: "$649 (Launch)" },
+
+            // Legacy iPhone Models (5 Series back to Original)
+            { brand: "Apple", model: "iPhone 5s", display: "4.0\" IPS LCD", resolution: "640 x 1136 pixels", processor: "Apple A7 (28 nm)", ram: "1 GB", storage: "16GB / 32GB / 64GB", main_camera: "8 MP", selfie_camera: "1.2 MP", battery: "1560 mAh", charging: "Wired", os: "iOS 7", weight: "112 g", price: "$199 (On Contract)" },
+            { brand: "Apple", model: "iPhone 5c", display: "4.0\" IPS LCD", resolution: "640 x 1136 pixels", processor: "Apple A6 (32 nm)", ram: "1 GB", storage: "8GB / 16GB / 32GB", main_camera: "8 MP", selfie_camera: "1.2 MP", battery: "1510 mAh", charging: "Wired", os: "iOS 7", weight: "132 g", price: "$99 (On Contract)" },
+            { brand: "Apple", model: "iPhone 5", display: "4.0\" IPS LCD", resolution: "640 x 1136 pixels", processor: "Apple A6 (32 nm)", ram: "1 GB", storage: "16GB / 32GB / 64GB", main_camera: "8 MP", selfie_camera: "1.2 MP", battery: "1440 mAh", charging: "Wired", os: "iOS 6", weight: "112 g", price: "$199 (On Contract)" },
+            { brand: "Apple", model: "iPhone 4s", display: "3.5\" IPS LCD", resolution: "640 x 960 pixels", processor: "Apple A5 (45 nm)", ram: "512 MB", storage: "8GB / 16GB / 32GB / 64GB", main_camera: "8 MP", selfie_camera: "VGA", battery: "1432 mAh", charging: "30-pin wired", os: "iOS 5", weight: "140 g", price: "$199 (On Contract)" },
+            { brand: "Apple", model: "iPhone 4", display: "3.5\" IPS LCD", resolution: "640 x 960 pixels", processor: "Apple A4 (45 nm)", ram: "512 MB", storage: "8GB / 16GB / 32GB", main_camera: "5 MP", selfie_camera: "VGA", battery: "1420 mAh", charging: "30-pin wired", os: "iOS 4", weight: "137 g", price: "$199 (On Contract)" },
+            { brand: "Apple", model: "iPhone 3GS", display: "3.5\" TFT", resolution: "320 x 480 pixels", processor: "600 MHz Cortex-A8", ram: "256 MB", storage: "8GB / 16GB / 32GB", main_camera: "3.15 MP", selfie_camera: "None", battery: "1400 mAh", charging: "30-pin wired", os: "iPhone OS 3", weight: "135 g", price: "$199 (On Contract)" },
+            { brand: "Apple", model: "iPhone 3G", display: "3.5\" TFT", resolution: "320 x 480 pixels", processor: "412 MHz ARM 11", ram: "128 MB", storage: "8GB / 16GB", main_camera: "2 MP", selfie_camera: "None", battery: "1150 mAh", charging: "30-pin wired", os: "iPhone OS 2", weight: "133 g", price: "$199 (On Contract)" },
+            { brand: "Apple", model: "iPhone (Original)", display: "3.5\" TFT", resolution: "320 x 480 pixels", processor: "412 MHz ARM 11", ram: "128 MB", storage: "4GB / 8GB / 16GB", main_camera: "2 MP", selfie_camera: "None", battery: "1400 mAh", charging: "30-pin wired", os: "iPhone OS 1", weight: "135 g", price: "$499 (Launch)" },
+            
+            // GOOGLE (Starting from Pixel 6)
+            { brand: "Google", model: "Pixel 6", display: "6.4\" AMOLED, 90Hz", resolution: "1080 x 2400 pixels", processor: "Google Tensor (5 nm)", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP (wide) + 12 MP (ultrawide)", selfie_camera: "8 MP (wide)", battery: "4614 mAh", charging: "21W wired, 21W wireless", os: "Android 12 (upgradable)", weight: "207 g", price: "$599 (Launch)" },
+            { brand: "Google", model: "Pixel 6 Pro", display: "6.7\" LTPO AMOLED, 120Hz", resolution: "1440 x 3120 pixels", processor: "Google Tensor (5 nm)", ram: "12 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP (wide) + 48 MP (telephoto 4x) + 12 MP (ultrawide)", selfie_camera: "11.1 MP (ultrawide)", battery: "5003 mAh", charging: "23W wired, 23W wireless", os: "Android 12 (upgradable)", weight: "210 g", price: "$899 (Launch)" },
+            { brand: "Google", model: "Pixel 6a", display: "6.1\" OLED, 60Hz", resolution: "1080 x 2400 pixels", processor: "Google Tensor (5 nm)", ram: "6 GB", storage: "128GB", main_camera: "12.2 MP (wide) + 12 MP (ultrawide)", selfie_camera: "8 MP (wide)", battery: "4410 mAh", charging: "18W wired", os: "Android 12 (upgradable)", weight: "178 g", price: "$449 (Launch)" },
+            { brand: "Google", model: "Pixel 7", display: "6.3\" AMOLED, 90Hz", resolution: "1080 x 2400 pixels", processor: "Google Tensor G2 (5 nm)", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP (wide) + 12 MP (ultrawide)", selfie_camera: "10.8 MP (ultrawide)", battery: "4355 mAh", charging: "20W wired, 20W wireless", os: "Android 13 (upgradable)", weight: "197 g", price: "$599 (Launch)" },
+            { brand: "Google", model: "Pixel 7 Pro", display: "6.7\" LTPO AMOLED, 120Hz", resolution: "1440 x 3120 pixels", processor: "Google Tensor G2 (5 nm)", ram: "12 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP (wide) + 48 MP (telephoto 5x) + 12 MP (ultrawide)", selfie_camera: "10.8 MP (ultrawide)", battery: "5000 mAh", charging: "23W wired, 23W wireless", os: "Android 13 (upgradable)", weight: "212 g", price: "$899 (Launch)" },
+            { brand: "Google", model: "Pixel 7a", display: "6.1\" OLED, 90Hz", resolution: "1080 x 2400 pixels", processor: "Google Tensor G2 (5 nm)", ram: "8 GB", storage: "128GB", main_camera: "64 MP (wide) + 13 MP (ultrawide)", selfie_camera: "13 MP (ultrawide)", battery: "4385 mAh", charging: "18W wired, 7.5W wireless", os: "Android 13 (upgradable)", weight: "193.5 g", price: "$499 (Launch)" },
+            { brand: "Google", model: "Pixel Fold", display: "7.6\" Foldable OLED 120Hz + 5.8\" OLED Cover", resolution: "1840 x 2208 (Inner) / 1080 x 2092 (Outer)", processor: "Google Tensor G2 (5 nm)", ram: "12 GB", storage: "256GB / 512GB", main_camera: "48 MP (wide) + 10.8 MP (telephoto 5x) + 10.8 MP (ultrawide)", selfie_camera: "8 MP (inner) + 9.5 MP (cover)", battery: "4821 mAh", charging: "21W wired, wireless", os: "Android 13 (upgradable)", weight: "283 g", price: "$1799 (Launch)" },
+            { brand: "Google", model: "Pixel 8", display: "6.2\" OLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Google Tensor G3 (4 nm)", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP (wide) + 12 MP (ultrawide)", selfie_camera: "10.5 MP (ultrawide)", battery: "4575 mAh", charging: "27W wired, 18W wireless", os: "Android 14", weight: "187 g", price: "$699 (Launch)" },
+            { brand: "Google", model: "Pixel 8 Pro", display: "6.7\" LTPO OLED, 120Hz", resolution: "1344 x 2992 pixels", processor: "Google Tensor G3 (4 nm)", ram: "12 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "50 MP (wide) + 48 MP (telephoto 5x) + 48 MP (ultrawide)", selfie_camera: "10.5 MP (ultrawide)", battery: "5050 mAh", charging: "30W wired, 23W wireless", os: "Android 14", weight: "213 g", price: "$999 (Launch)" },
+            { brand: "Google", model: "Pixel 8a", display: "6.1\" OLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Google Tensor G3 (4 nm)", ram: "8 GB", storage: "128GB / 256GB", main_camera: "64 MP (wide) + 13 MP (ultrawide)", selfie_camera: "13 MP (ultrawide)", battery: "4492 mAh", charging: "18W wired, 7.5W wireless", os: "Android 14", weight: "188 g", price: "$499 (Launch)" },
+          // Pixel 9 Series
+            { brand: "Google", model: "Pixel 9", display: "6.3\" OLED, 120Hz", resolution: "1080 x 2424 pixels", processor: "Google Tensor G4 (4 nm)", ram: "12 GB", storage: "128GB / 256GB", main_camera: "50 MP (wide) + 48 MP (ultrawide)", selfie_camera: "10.5 MP (ultrawide)", battery: "4700 mAh", charging: "27W wired, 15W wireless", os: "Android 14 (upgradable)", weight: "198 g", price: "$799 (Launch)" },
+            { brand: "Google", model: "Pixel 9 Pro", display: "6.3\" LTPO OLED, 120Hz", resolution: "1280 x 2856 pixels", processor: "Google Tensor G4 (4 nm)", ram: "16 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "50 MP (wide) + 48 MP (telephoto 5x) + 48 MP (ultrawide)", selfie_camera: "42 MP (ultrawide)", battery: "4700 mAh", charging: "27W wired, 21W wireless", os: "Android 14 (upgradable)", weight: "199 g", price: "$999 (Launch)" },
+            { brand: "Google", model: "Pixel 9 Pro XL", display: "6.8\" LTPO OLED, 120Hz", resolution: "1344 x 2992 pixels", processor: "Google Tensor G4 (4 nm)", ram: "16 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "50 MP (wide) + 48 MP (telephoto 5x) + 48 MP (ultrawide)", selfie_camera: "42 MP (ultrawide)", battery: "5060 mAh", charging: "37W wired, 23W wireless", os: "Android 14 (upgradable)", weight: "221 g", price: "$1099 (Launch)" },
+            { brand: "Google", model: "Pixel 9 Pro Fold", display: "8.0\" Foldable LTPO OLED, 120Hz + 6.3\" Cover display", resolution: "2076 x 2152 (Inner) / 1080 x 2424 (Cover)", processor: "Google Tensor G4 (4 nm)", ram: "16 GB", storage: "256GB / 512GB", main_camera: "48 MP (wide) + 10.8 MP (telephoto 5x) + 10.5 MP (ultrawide)", selfie_camera: "10 MP (inner) + 10 MP (cover)", battery: "4650 mAh", charging: "21W wired, 7.5W wireless", os: "Android 14 (upgradable)", weight: "257 g", price: "$1799 (Launch)" },
+            { brand: "Google", model: "Pixel 9a", display: "6.3\" OLED, 120Hz", resolution: "1080 x 2424 pixels", processor: "Google Tensor G4 (4 nm)", ram: "8 GB", storage: "128GB / 256GB", main_camera: "48 MP (wide) + 13 MP (ultrawide)", selfie_camera: "13 MP", battery: "5000 mAh", charging: "18W wired, 7.5W wireless", os: "Android 15", weight: "190 g", price: "$499 (Launch)" },
+
+            // Pixel 10 Series
+            { brand: "Google", model: "Pixel 10", display: "6.3\" OLED, 120Hz", resolution: "1080 x 2424 pixels", processor: "Google Tensor G5 (3 nm)", ram: "12 GB", storage: "128GB / 256GB", main_camera: "50 MP (wide) + 48 MP (ultrawide)", selfie_camera: "12 MP", battery: "4800 mAh", charging: "30W wired, wireless", os: "Android 15 (upgradable)", weight: "195 g", price: "$799 (Launch)" },
+            { brand: "Google", model: "Pixel 10 Pro", display: "6.3\" LTPO OLED, 120Hz", resolution: "1280 x 2856 pixels", processor: "Google Tensor G5 (3 nm)", ram: "16 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "50 MP (wide) + 50 MP (telephoto 5x) + 48 MP (ultrawide)", selfie_camera: "42 MP", battery: "4800 mAh", charging: "30W wired, wireless", os: "Android 15 (upgradable)", weight: "197 g", price: "$999 (Launch)" },
+            { brand: "Google", model: "Pixel 10 Pro XL", display: "6.8\" LTPO OLED, 120Hz", resolution: "1344 x 2992 pixels", processor: "Google Tensor G5 (3 nm)", ram: "16 GB", storage: "256GB / 512GB / 1TB", main_camera: "50 MP (wide) + 50 MP (telephoto 5x) + 50 MP (ultrawide)", selfie_camera: "42 MP", battery: "5100 mAh", charging: "45W wired, wireless", os: "Android 15 (upgradable)", weight: "219 g", price: "$1099 (Launch)" },
+            { brand: "Google", model: "Pixel 10 Pro Fold", display: "8.02\" Foldable LTPO OLED, 120Hz", resolution: "2080 x 2160 pixels", processor: "Google Tensor G5 (3 nm)", ram: "16 GB", storage: "256GB / 512GB", main_camera: "48 MP (wide) + 12 MP (telephoto) + 12 MP (ultrawide)", selfie_camera: "10 MP (inner) + 10 MP (cover)", battery: "4700 mAh", charging: "25W wired, wireless", os: "Android 15 (upgradable)", weight: "250 g", price: "$1799 (Launch)" },
+            { brand: "Google", model: "Pixel 10a", display: "6.2\" OLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Google Tensor G5 (3 nm)", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP (wide) + 13 MP (ultrawide)", selfie_camera: "13 MP", battery: "4600 mAh", charging: "18W wired, wireless", os: "Android 16", weight: "186 g", price: "$499 (Launch)" },
+
+            // SAMSUNG (Galaxy S20 Series onward, Z Series, Key A Series)
+            { brand: "Samsung", model: "Galaxy S20", display: "6.2\" Dynamic AMOLED 2X, 120Hz", resolution: "1440 x 3200 pixels", processor: "Exynos 990 / Snapdragon 865", ram: "8 GB", storage: "128GB", main_camera: "12 MP (wide) + 64 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "10 MP", battery: "4000 mAh", charging: "25W wired, 15W wireless", os: "Android 10 (upgradable)", weight: "163 g", price: "$999 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S20+", display: "6.7\" Dynamic AMOLED 2X, 120Hz", resolution: "1440 x 3200 pixels", processor: "Exynos 990 / Snapdragon 865", ram: "8 GB", storage: "128GB", main_camera: "12 MP (wide) + 64 MP (telephoto 3x) + 12 MP (ultrawide) + TOF 3D", selfie_camera: "10 MP", battery: "4500 mAh", charging: "25W wired, 15W wireless", os: "Android 10 (upgradable)", weight: "186 g", price: "$1199 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S20 Ultra", display: "6.9\" Dynamic AMOLED 2X, 120Hz", resolution: "1440 x 3200 pixels", processor: "Exynos 990 / Snapdragon 865", ram: "12 GB", storage: "128GB / 256GB / 512GB", main_camera: "108 MP (wide) + 48 MP (periscope 4x) + 12 MP (ultrawide) + TOF 3D", selfie_camera: "40 MP", battery: "5000 mAh", charging: "45W wired, 15W wireless", os: "Android 10 (upgradable)", weight: "220 g", price: "$1399 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S20 FE", display: "6.5\" Super AMOLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Exynos 990 / Snapdragon 865", ram: "6 GB / 8 GB", storage: "128GB / 256GB", main_camera: "12 MP (wide) + 8 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "32 MP", battery: "4500 mAh", charging: "25W wired, 15W wireless", os: "Android 10 (upgradable)", weight: "190 g", price: "$699 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S21", display: "6.2\" Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2400 pixels", processor: "Exynos 2100 / Snapdragon 888", ram: "8 GB", storage: "128GB / 256GB", main_camera: "12 MP (wide) + 64 MP (telephoto 1.1x) + 12 MP (ultrawide)", selfie_camera: "10 MP", battery: "4000 mAh", charging: "25W wired, 15W wireless", os: "Android 11 (upgradable)", weight: "169 g", price: "$799 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S21+", display: "6.7\" Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2400 pixels", processor: "Exynos 2100 / Snapdragon 888", ram: "8 GB", storage: "128GB / 256GB", main_camera: "12 MP (wide) + 64 MP (telephoto 1.1x) + 12 MP (ultrawide)", selfie_camera: "10 MP", battery: "4800 mAh", charging: "25W wired, 15W wireless", os: "Android 11 (upgradable)", weight: "200 g", price: "$999 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S21 Ultra", display: "6.8\" Dynamic AMOLED 2X, 120Hz", resolution: "1440 x 3200 pixels", processor: "Exynos 2100 / Snapdragon 888", ram: "12 GB / 16 GB", storage: "128GB / 256GB / 512GB", main_camera: "108 MP (wide) + 10 MP (periscope 10x) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "40 MP", battery: "5000 mAh", charging: "25W wired, 15W wireless", os: "Android 11 (upgradable)", weight: "227 g", price: "$1199 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S21 FE", display: "6.4\" Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2400 pixels", processor: "Exynos 2100 / Snapdragon 888", ram: "6 GB / 8 GB", storage: "128GB / 256GB", main_camera: "12 MP (wide) + 8 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "32 MP", battery: "4500 mAh", charging: "25W wired, 15W wireless", os: "Android 12 (upgradable)", weight: "177 g", price: "$699 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S22", display: "6.1\" Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2340 pixels", processor: "Exynos 2200 / Snapdragon 8 Gen 1", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP (wide) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "10 MP", battery: "3700 mAh", charging: "25W wired, 15W wireless", os: "Android 12 (upgradable)", weight: "167 g", price: "$799 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S22+", display: "6.6\" Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2340 pixels", processor: "Exynos 2200 / Snapdragon 8 Gen 1", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP (wide) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "10 MP", battery: "4500 mAh", charging: "45W wired, 15W wireless", os: "Android 12 (upgradable)", weight: "195 g", price: "$999 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S22 Ultra", display: "6.8\" Dynamic AMOLED 2X, 120Hz", resolution: "1440 x 3088 pixels", processor: "Exynos 2200 / Snapdragon 8 Gen 1", ram: "8 GB / 12 GB", storage: "128GB / 256GB / 512GB / 1TB", main_camera: "108 MP (wide) + 10 MP (periscope 10x) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "40 MP", battery: "5000 mAh", charging: "45W wired, 15W wireless", os: "Android 12 (upgradable)", weight: "228 g", price: "$1199 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S23", display: "6.1\" Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2340 pixels", processor: "Snapdragon 8 Gen 2 for Galaxy", ram: "8 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP (wide) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "12 MP", battery: "3900 mAh", charging: "25W wired, 15W wireless", os: "Android 13 (upgradable)", weight: "168 g", price: "$799 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S23+", display: "6.6\" Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2340 pixels", processor: "Snapdragon 8 Gen 2 for Galaxy", ram: "8 GB", storage: "256GB / 512GB", main_camera: "50 MP (wide) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "12 MP", battery: "4700 mAh", charging: "45W wired, 15W wireless", os: "Android 13 (upgradable)", weight: "196 g", price: "$999 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S23 Ultra", display: "6.8\" Dynamic AMOLED 2X, 120Hz", resolution: "1440 x 3088 pixels", processor: "Snapdragon 8 Gen 2 for Galaxy", ram: "8 GB / 12 GB", storage: "256GB / 512GB / 1TB", main_camera: "200 MP (wide) + 10 MP (periscope 10x) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "12 MP", battery: "5000 mAh", charging: "45W wired, 15W wireless", os: "Android 13 (upgradable)", weight: "234 g", price: "$1199 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S23 FE", display: "6.4\" Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2340 pixels", processor: "Exynos 2200 / Snapdragon 8 Gen 1", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP (wide) + 8 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "10 MP", battery: "4500 mAh", charging: "25W wired, 15W wireless", os: "Android 13 (upgradable)", weight: "209 g", price: "$599 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S24", display: "6.2\" Dynamic LTPO AMOLED 2X, 120Hz", resolution: "1080 x 2340 pixels", processor: "Exynos 2400 / Snapdragon 8 Gen 3", ram: "8 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP (wide) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "12 MP", battery: "4000 mAh", charging: "25W wired, 15W wireless", os: "Android 14", weight: "167 g", price: "$799 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S24+", display: "6.7\" Dynamic LTPO AMOLED 2X, 120Hz", resolution: "1440 x 3120 pixels", processor: "Exynos 2400 / Snapdragon 8 Gen 3", ram: "12 GB", storage: "256GB / 512GB", main_camera: "50 MP (wide) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "12 MP", battery: "4900 mAh", charging: "45W wired, 15W wireless", os: "Android 14", weight: "196 g", price: "$999 (Launch)" },
+            { brand: "Samsung", model: "Galaxy S24 Ultra", display: "6.8\" Dynamic LTPO AMOLED 2X, 120Hz", resolution: "1440 x 3120 pixels", processor: "Snapdragon 8 Gen 3 for Galaxy", ram: "12 GB", storage: "256GB / 512GB / 1TB", main_camera: "200 MP (wide) + 50 MP (periscope 5x) + 10 MP (telephoto 3x) + 12 MP (ultrawide)", selfie_camera: "12 MP", battery: "5000 mAh", charging: "45W wired, 15W wireless", os: "Android 14", weight: "232 g", price: "$1299 (Launch)" },
+            
+            { brand: "Samsung", model: "Galaxy Z Flip", display: "6.7\" Foldable Dynamic AMOLED", resolution: "1080 x 2636 pixels", processor: "Snapdragon 855+", ram: "8 GB", storage: "256GB", main_camera: "12 MP + 12 MP", selfie_camera: "10 MP", battery: "3300 mAh", charging: "15W wired", os: "Android 10", weight: "183 g", price: "$1380" },
+            { brand: "Samsung", model: "Galaxy Z Fold2", display: "7.6\" Foldable Dynamic AMOLED 2X, 120Hz", resolution: "1768 x 2208 pixels", processor: "Snapdragon 865 5G+", ram: "12 GB", storage: "256GB / 512GB", main_camera: "12 MP + 12 MP + 12 MP", selfie_camera: "10 MP (inner), 10 MP (cover)", battery: "4500 mAh", charging: "25W wired", os: "Android 10", weight: "282 g", price: "$1999" },
+            { brand: "Samsung", model: "Galaxy Z Flip3", display: "6.7\" Foldable Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2640 pixels", processor: "Snapdragon 888 5G", ram: "8 GB", storage: "128GB / 256GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "10 MP", battery: "3300 mAh", charging: "15W wired", os: "Android 11", weight: "183 g", price: "$999" },
+            { brand: "Samsung", model: "Galaxy Z Fold3", display: "7.6\" Foldable Dynamic AMOLED 2X, 120Hz", resolution: "1768 x 2208 pixels", processor: "Snapdragon 888 5G", ram: "12 GB", storage: "256GB / 512GB", main_camera: "12 MP + 12 MP + 12 MP", selfie_camera: "4 MP (UDC) + 10 MP (Cover)", battery: "4400 mAh", charging: "25W wired", os: "Android 11", weight: "271 g", price: "$1799" },
+            { brand: "Samsung", model: "Galaxy Z Flip4", display: "6.7\" Foldable Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2640 pixels", processor: "Snapdragon 8+ Gen 1", ram: "8 GB", storage: "128GB / 256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "10 MP", battery: "3700 mAh", charging: "25W wired", os: "Android 12", weight: "187 g", price: "$999" },
+            { brand: "Samsung", model: "Galaxy Z Fold4", display: "7.6\" Foldable Dynamic AMOLED 2X, 120Hz", resolution: "1812 x 2176 pixels", processor: "Snapdragon 8+ Gen 1", ram: "12 GB", storage: "256GB / 512GB / 1TB", main_camera: "50 MP + 10 MP + 12 MP", selfie_camera: "4 MP (UDC) + 10 MP (Cover)", battery: "4400 mAh", charging: "25W wired", os: "Android 12", weight: "263 g", price: "$1799" },
+            { brand: "Samsung", model: "Galaxy Z Flip5", display: "6.7\" Foldable Dynamic AMOLED 2X, 120Hz", resolution: "1080 x 2640 pixels", processor: "Snapdragon 8 Gen 2 for Galaxy", ram: "8 GB", storage: "256GB / 512GB", main_camera: "12 MP (wide) + 12 MP (ultrawide)", selfie_camera: "10 MP", battery: "3700 mAh", charging: "25W wired", os: "Android 13", weight: "187 g", price: "$999" },
+            { brand: "Samsung", model: "Galaxy Z Fold5", display: "7.6\" Foldable Dynamic AMOLED 2X, 120Hz", resolution: "1812 x 2176 pixels", processor: "Snapdragon 8 Gen 2 for Galaxy", ram: "12 GB", storage: "256GB / 512GB / 1TB", main_camera: "50 MP + 10 MP + 12 MP", selfie_camera: "4 MP (UDC) + 10 MP (Cover)", battery: "4400 mAh", charging: "25W wired", os: "Android 13", weight: "253 g", price: "$1799" },
+
+            { brand: "Samsung", model: "Galaxy A52", display: "6.5\" Super AMOLED, 90Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 720G", ram: "4/6/8 GB", storage: "128GB / 256GB", main_camera: "64 MP + 12 MP + 5 MP + 5 MP", selfie_camera: "32 MP", battery: "4500 mAh", charging: "25W wired", os: "Android 11", weight: "189 g", price: "$349" },
+            { brand: "Samsung", model: "Galaxy A53 5G", display: "6.5\" Super AMOLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Exynos 1280", ram: "4/6/8 GB", storage: "128GB / 256GB", main_camera: "64 MP + 12 MP + 5 MP + 5 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "25W wired", os: "Android 12", weight: "189 g", price: "$449" },
+            { brand: "Samsung", model: "Galaxy A54 5G", display: "6.4\" Super AMOLED, 120Hz", resolution: "1080 x 2340 pixels", processor: "Exynos 1380", ram: "6/8 GB", storage: "128GB / 256GB", main_camera: "50 MP + 12 MP + 5 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "25W wired", os: "Android 13", weight: "202 g", price: "$449" },
+            { brand: "Samsung", model: "Galaxy A55 5G", display: "6.6\" Super AMOLED, 120Hz", resolution: "1080 x 2340 pixels", processor: "Exynos 1480", ram: "8/12 GB", storage: "128GB / 256GB", main_camera: "50 MP + 12 MP + 5 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "25W wired", os: "Android 14", weight: "213 g", price: "€479" },
+
+            // ONEPLUS (Padding data for variety)
+            { brand: "OnePlus", model: "OnePlus 8 Pro", display: "6.78\" Fluid AMOLED, 120Hz", resolution: "1440 x 3168 pixels", processor: "Snapdragon 865", ram: "8/12 GB", storage: "128GB / 256GB", main_camera: "48 MP + 8 MP + 48 MP + 5 MP", selfie_camera: "16 MP", battery: "4510 mAh", charging: "30W wired, 30W wireless", os: "Android 10", weight: "199 g", price: "$899" },
+            { brand: "OnePlus", model: "OnePlus 9 Pro", display: "6.7\" LTPO Fluid2 AMOLED, 120Hz", resolution: "1440 x 3216 pixels", processor: "Snapdragon 888 5G", ram: "8/12 GB", storage: "128GB / 256GB", main_camera: "48 MP + 8 MP + 50 MP + 2 MP", selfie_camera: "16 MP", battery: "4500 mAh", charging: "65W wired, 50W wireless", os: "Android 11", weight: "197 g", price: "$969" },
+            { brand: "OnePlus", model: "OnePlus 10 Pro", display: "6.7\" LTPO2 Fluid AMOLED, 120Hz", resolution: "1440 x 3216 pixels", processor: "Snapdragon 8 Gen 1", ram: "8/12 GB", storage: "128GB / 256GB / 512GB", main_camera: "48 MP + 8 MP + 50 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "80W wired, 50W wireless", os: "Android 12", weight: "201 g", price: "$899" },
+            { brand: "OnePlus", model: "OnePlus 11", display: "6.7\" LTPO3 Fluid AMOLED, 120Hz", resolution: "1440 x 3216 pixels", processor: "Snapdragon 8 Gen 2", ram: "8/12/16 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP + 32 MP + 48 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "100W wired", os: "Android 13", weight: "205 g", price: "$699" },
+            { brand: "OnePlus", model: "OnePlus 12", display: "6.82\" LTPO AMOLED, 120Hz", resolution: "1440 x 3168 pixels", processor: "Snapdragon 8 Gen 3", ram: "12/16/24 GB", storage: "256GB / 512GB / 1TB", main_camera: "50 MP + 64 MP + 48 MP", selfie_camera: "32 MP", battery: "5400 mAh", charging: "100W wired, 50W wireless", os: "Android 14", weight: "220 g", price: "$799" },
+            { brand: "OnePlus", model: "OnePlus Open", display: "7.82\" Foldable LTPO3 Fluid AMOLED", resolution: "2268 x 2440 pixels", processor: "Snapdragon 8 Gen 2", ram: "16 GB", storage: "512GB / 1TB", main_camera: "48 MP + 64 MP + 48 MP", selfie_camera: "20 MP (inner) + 32 MP (cover)", battery: "4805 mAh", charging: "67W wired", os: "Android 13", weight: "239 g", price: "$1699" },
+          // OnePlus Flagships (Continuation)
+            { brand: "OnePlus", model: "OnePlus 10T", display: "6.7\" Fluid AMOLED, 120Hz", resolution: "1080 x 2412 pixels", processor: "Snapdragon 8+ Gen 1", ram: "8/12/16 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP + 2 MP", selfie_camera: "16 MP", battery: "4800 mAh", charging: "150W SUPERVOOC", os: "Android 12", weight: "204 g", price: "$649 (Launch)" },
+            { brand: "OnePlus", model: "OnePlus 11R", display: "6.74\" Fluid AMOLED, 120Hz", resolution: "1240 x 2772 pixels", processor: "Snapdragon 8+ Gen 1", ram: "8/16 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP + 2 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "100W SUPERVOOC", os: "Android 13", weight: "204 g", price: "₹39,999 (Launch)" },
+            { brand: "OnePlus", model: "OnePlus 12R", display: "6.78\" LTPO4 AMOLED, 120Hz", resolution: "1264 x 2780 pixels", processor: "Snapdragon 8 Gen 2", ram: "8/12/16 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP + 2 MP", selfie_camera: "16 MP", battery: "5500 mAh", charging: "100W SUPERVOOC", os: "Android 14", weight: "207 g", price: "$499 (Launch)" },
+            { brand: "OnePlus", model: "OnePlus 13", display: "6.82\" BOE LTPO AMOLED, 120Hz", resolution: "1440 x 3168 pixels", processor: "Snapdragon 8 Elite", ram: "12/16/24 GB", storage: "256GB / 512GB / 1TB", main_camera: "50 MP + 50 MP + 50 MP", selfie_camera: "32 MP", battery: "6000 mAh", charging: "100W wired, 50W wireless", os: "Android 15", weight: "210 g", price: "$799 (Launch)" },
+            { brand: "OnePlus", model: "OnePlus 13R", display: "6.78\" LTPO AMOLED, 120Hz", resolution: "1264 x 2780 pixels", processor: "Snapdragon 8 Gen 3", ram: "12/16 GB", storage: "256GB / 512GB", main_camera: "50 MP + 8 MP + 2 MP", selfie_camera: "16 MP", battery: "6200 mAh", charging: "100W SUPERVOOC", os: "Android 15", weight: "202 g", price: "$599 (Launch)" },
+            { brand: "OnePlus", model: "OnePlus Ace 3 Pro", display: "6.78\" OLED, 120Hz", resolution: "1264 x 2780 pixels", processor: "Snapdragon 8 Gen 2", ram: "12/16/24 GB", storage: "256GB / 512GB / 1TB", main_camera: "50 MP + 8 MP + 2 MP", selfie_camera: "16 MP", battery: "6100 mAh", charging: "100W wired", os: "Android 14", weight: "207 g", price: "¥3,199 (Launch)" },
+
+            // OnePlus Nord Series (Mid-range & Budget)
+            { brand: "OnePlus", model: "Nord CE 2 Lite 5G", display: "6.59\" IPS LCD, 120Hz", resolution: "1080 x 2412 pixels", processor: "Snapdragon 695 5G", ram: "6/8 GB", storage: "128GB", main_camera: "64 MP + 2 MP + 2 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "33W SUPERVOOC", os: "Android 12", weight: "195 g", price: "€299 (Launch)" },
+            { brand: "OnePlus", model: "Nord 2T", display: "6.43\" AMOLED, 90Hz", resolution: "1080 x 2400 pixels", processor: "Dimensity 1300", ram: "8/12 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP + 2 MP", selfie_camera: "32 MP", battery: "4500 mAh", charging: "80W SUPERVOOC", os: "Android 12", weight: "190 g", price: "€369 (Launch)" },
+            { brand: "OnePlus", model: "Nord 3 5G", display: "6.74\" Fluid AMOLED, 120Hz", resolution: "1240 x 2772 pixels", processor: "Dimensity 9000", ram: "8/16 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP + 2 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "80W SUPERVOOC", os: "Android 13", weight: "193.5 g", price: "€449 (Launch)" },
+            { brand: "OnePlus", model: "Nord CE 3 Lite 5G", display: "6.72\" IPS LCD, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 695 5G", ram: "8 GB", storage: "128GB / 256GB", main_camera: "108 MP + 2 MP + 2 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "67W SUPERVOOC", os: "Android 13", weight: "195 g", price: "€329 (Launch)" },
+            { brand: "OnePlus", model: "Nord N30 5G", display: "6.72\" IPS LCD, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 695 5G", ram: "8 GB", storage: "128GB", main_camera: "108 MP + 2 MP + 2 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "50W SUPERVOOC", os: "Android 13", weight: "195 g", price: "$299 (Launch)" },
+            { brand: "OnePlus", model: "Nord CE 4", display: "6.7\" Fluid AMOLED, 120Hz", resolution: "1080 x 2412 pixels", processor: "Snapdragon 7 Gen 3", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP", selfie_camera: "16 MP", battery: "5500 mAh", charging: "100W SUPERVOOC", os: "Android 14", weight: "186 g", price: "₹24,999 (Launch)" },
+            { brand: "OnePlus", model: "Nord 4", display: "6.74\" Fluid AMOLED, 120Hz", resolution: "1240 x 2772 pixels", processor: "Snapdragon 7+ Gen 3", ram: "8/12/16 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP + 8 MP", selfie_camera: "16 MP", battery: "5500 mAh", charging: "100W SUPERVOOC", os: "Android 14", weight: "199 g", price: "€499 (Launch)" },
+            { brand: "OnePlus", model: "Nord CE 4 Lite 5G", display: "6.67\" AMOLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 695 5G", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP + 2 MP", selfie_camera: "16 MP", battery: "5110 mAh", charging: "80W SUPERVOOC", os: "Android 14", weight: "191 g", price: "€329 (Launch)" },
+            { brand: "OnePlus", model: "Nord N300 5G", display: "6.56\" IPS LCD, 90Hz", resolution: "720 x 1612 pixels", processor: "Dimensity 810", ram: "4 GB", storage: "64GB", main_camera: "48 MP + 2 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "33W SUPERVOOC", os: "Android 12", weight: "190 g", price: "$228 (Launch)" },
+
+            // XIAOMI (Padding)
+            { brand: "Xiaomi", model: "Xiaomi 12 Pro", display: "6.73\" LTPO AMOLED, 120Hz", resolution: "1440 x 3200 pixels", processor: "Snapdragon 8 Gen 1", ram: "8/12 GB", storage: "128GB / 256GB", main_camera: "50 MP + 50 MP + 50 MP", selfie_camera: "32 MP", battery: "4600 mAh", charging: "120W wired, 50W wireless", os: "Android 12", weight: "204 g", price: "$999" },
+            { brand: "Xiaomi", model: "Xiaomi 13 Pro", display: "6.73\" LTPO AMOLED, 120Hz", resolution: "1440 x 3200 pixels", processor: "Snapdragon 8 Gen 2", ram: "8/12 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP + 50 MP + 50 MP", selfie_camera: "32 MP", battery: "4820 mAh", charging: "120W wired, 50W wireless", os: "Android 13", weight: "210 g", price: "$1299" },
+            { brand: "Xiaomi", model: "Xiaomi 14 Pro", display: "6.73\" LTPO AMOLED, 120Hz", resolution: "1440 x 3200 pixels", processor: "Snapdragon 8 Gen 3", ram: "12/16 GB", storage: "256GB / 512GB / 1TB", main_camera: "50 MP + 50 MP + 50 MP", selfie_camera: "32 MP", battery: "4880 mAh", charging: "120W wired, 50W wireless", os: "Android 14", weight: "223 g", price: "€1099" },
+            { brand: "Xiaomi", model: "Xiaomi 14 Ultra", display: "6.73\" LTPO AMOLED, 120Hz", resolution: "1440 x 3200 pixels", processor: "Snapdragon 8 Gen 3", ram: "12/16 GB", storage: "256GB / 512GB / 1TB", main_camera: "50 MP + 50 MP + 50 MP + 50 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "90W wired, 80W wireless", os: "Android 14", weight: "224 g", price: "€1499" },
+
+            // SONY (Padding)
+            { brand: "Sony", model: "Xperia 1 III", display: "6.5\" OLED, 120Hz, 4K", resolution: "1644 x 3840 pixels", processor: "Snapdragon 888", ram: "12 GB", storage: "256GB / 512GB", main_camera: "12 MP + 12 MP + 12 MP", selfie_camera: "8 MP", battery: "4500 mAh", charging: "30W wired", os: "Android 11", weight: "186 g", price: "$1299" },
+            { brand: "Sony", model: "Xperia 1 IV", display: "6.5\" OLED, 120Hz, 4K", resolution: "1644 x 3840 pixels", processor: "Snapdragon 8 Gen 1", ram: "12 GB", storage: "256GB / 512GB", main_camera: "12 MP + 12 MP + 12 MP", selfie_camera: "12 MP", battery: "5000 mAh", charging: "30W wired", os: "Android 12", weight: "185 g", price: "$1599" },
+            { brand: "Sony", model: "Xperia 1 V", display: "6.5\" OLED, 120Hz, 4K", resolution: "1644 x 3840 pixels", processor: "Snapdragon 8 Gen 2", ram: "12 GB", storage: "256GB / 512GB", main_camera: "48 MP + 12 MP + 12 MP", selfie_camera: "12 MP", battery: "5000 mAh", charging: "30W wired", os: "Android 13", weight: "187 g", price: "$1399" },
+
+            // MOTOROLA (Padding)
+            { brand: "Motorola", model: "Edge 30 Pro", display: "6.7\" OLED, 144Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 8 Gen 1", ram: "8/12 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP + 50 MP + 2 MP", selfie_camera: "60 MP", battery: "4800 mAh", charging: "68W wired, 15W wireless", os: "Android 12", weight: "196 g", price: "$999" },
+            { brand: "Motorola", model: "Edge 40 Pro", display: "6.67\" OLED, 165Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 8 Gen 2", ram: "12 GB", storage: "256GB / 512GB", main_camera: "50 MP + 50 MP + 12 MP", selfie_camera: "60 MP", battery: "4600 mAh", charging: "125W wired, 15W wireless", os: "Android 13", weight: "199 g", price: "€899" },
+            { brand: "Motorola", model: "Razr+ 2023", display: "6.9\" Foldable LTPO AMOLED, 165Hz", resolution: "1080 x 2640 pixels", processor: "Snapdragon 8+ Gen 1", ram: "8/12 GB", storage: "256GB / 512GB", main_camera: "12 MP + 13 MP", selfie_camera: "32 MP", battery: "3800 mAh", charging: "30W wired, 5W wireless", os: "Android 13", weight: "188 g", price: "$999" },
+          // Motorola Edge Series & Razr Flags
+            { brand: "Motorola", model: "Edge 30 Ultra", display: "6.67\" OLED, 144Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 8+ Gen 1", ram: "12 GB", storage: "256GB / 512GB", main_camera: "200 MP + 50 MP + 12 MP", selfie_camera: "60 MP", battery: "4610 mAh", charging: "125W wired, 50W wireless", os: "Android 12", weight: "198 g", price: "$899 (Launch)" },
+            { brand: "Motorola", model: "Edge 40 Neo", display: "6.55\" P-OLED, 144Hz", resolution: "1080 x 2400 pixels", processor: "Dimensity 7030", ram: "8/12 GB", storage: "128GB / 256GB", main_camera: "50 MP + 13 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "68W wired", os: "Android 13", weight: "170 g", price: "€399 (Launch)" },
+            { brand: "Motorola", model: "Edge 50 Pro", display: "6.7\" P-OLED, 144Hz", resolution: "1220 x 2712 pixels", processor: "Snapdragon 7 Gen 3", ram: "8/12 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP + 10 MP + 13 MP", selfie_camera: "50 MP", battery: "4500 mAh", charging: "125W wired, 50W wireless", os: "Android 14", weight: "186 g", price: "€699 (Launch)" },
+            { brand: "Motorola", model: "Edge 50 Ultra", display: "6.7\" P-OLED, 144Hz", resolution: "1220 x 2712 pixels", processor: "Snapdragon 8s Gen 3", ram: "12/16 GB", storage: "512GB / 1TB", main_camera: "50 MP + 64 MP + 50 MP", selfie_camera: "50 MP", battery: "4500 mAh", charging: "125W wired, 50W wireless", os: "Android 14", weight: "197 g", price: "€999 (Launch)" },
+            { brand: "Motorola", model: "Edge 50 Fusion", display: "6.7\" P-OLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 7s Gen 2", ram: "8/12 GB", storage: "128GB / 256GB / 512GB", main_camera: "50 MP + 13 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "68W wired", os: "Android 14", weight: "175 g", price: "€349 (Launch)" },
+            { brand: "Motorola", model: "Edge 50 Neo", display: "6.4\" P-OLED, 120Hz", resolution: "1256 x 2760 pixels", processor: "Dimensity 7300", ram: "8/12 GB", storage: "256GB / 512GB", main_camera: "50 MP + 10 MP + 13 MP", selfie_camera: "32 MP", battery: "4310 mAh", charging: "68W wired, 15W wireless", os: "Android 14", weight: "171 g", price: "€499 (Launch)" },
+            { brand: "Motorola", model: "Edge (2024)", display: "6.6\" P-OLED, 144Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 7 Gen 1", ram: "8 GB", storage: "256GB", main_camera: "50 MP + 13 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "68W wired, 15W wireless", os: "Android 14", weight: "171 g", price: "$549 (Launch)" },
+            { brand: "Motorola", model: "Edge (2025)", display: "6.7\" P-OLED, 120Hz", resolution: "1220 x 2712 pixels", processor: "Dimensity 7400 Ultra", ram: "8 GB", storage: "256GB", main_camera: "50 MP + 50 MP + 10 MP", selfie_camera: "50 MP", battery: "5200 mAh", charging: "68W wired, 15W wireless", os: "Android 15", weight: "181 g", price: "$599 (Launch)" },
+            { brand: "Motorola", model: "Edge (2026)", display: "6.3\" AMOLED, 120Hz", resolution: "1216 x 2640 pixels", processor: "Dimensity 7450 (4 nm)", ram: "8 GB", storage: "128GB", main_camera: "50 MP + 10 MP + 50 MP", selfie_camera: "50 MP", battery: "5000 mAh", charging: "68W wired, 15W wireless", os: "Android 16", weight: "160.5 g", price: "$649 (Launch)" },
+            { brand: "Motorola", model: "Razr 40 Ultra / Ultra+", display: "6.9\" Foldable LTPO AMOLED, 165Hz", resolution: "1080 x 2640 pixels", processor: "Snapdragon 8+ Gen 1", ram: "8/12 GB", storage: "256GB / 512GB", main_camera: "12 MP + 13 MP", selfie_camera: "32 MP", battery: "3800 mAh", charging: "30W wired", os: "Android 13", weight: "184 g", price: "$999 (Launch)" },
+            { brand: "Motorola", model: "Razr 50 Ultra / Ultra+", display: "6.9\" Foldable LTPO AMOLED, 165Hz", resolution: "1080 x 2640 pixels", processor: "Snapdragon 8s Gen 3", ram: "12 GB", storage: "512GB", main_camera: "50 MP + 50 MP", selfie_camera: "32 MP", battery: "4000 mAh", charging: "45W wired, 15W wireless", os: "Android 14", weight: "189 g", price: "$999 (Launch)" },
+            { brand: "Motorola", model: "Razr (2026)", display: "6.9\" Foldable LTPO AMOLED, 165Hz", resolution: "1080 x 2640 pixels", processor: "Snapdragon 8+ Gen 3", ram: "12 GB", storage: "256GB / 512GB", main_camera: "50 MP + 50 MP", selfie_camera: "32 MP", battery: "4200 mAh", charging: "45W wired", os: "Android 16", weight: "187 g", price: "$899 (Launch)" },
+
+            // Moto G Mid-Rangers & Budget Series
+            { brand: "Motorola", model: "Moto G Stylus 5G (2022)", display: "6.8\" IPS LCD, 120Hz", resolution: "1080 x 2460 pixels", processor: "Snapdragon 695 5G", ram: "4/6/8 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP + 2 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "10W wired", os: "Android 12", weight: "215 g", price: "$499 (Launch)" },
+            { brand: "Motorola", model: "Moto G Stylus 5G (2023)", display: "6.6\" IPS LCD, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 6 Gen 1", ram: "6/8 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "20W wired", os: "Android 13", weight: "202 g", price: "$399 (Launch)" },
+            { brand: "Motorola", model: "Moto G Stylus 5G (2024)", display: "6.7\" P-OLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 6 Gen 1", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP + 13 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "30W wired, 15W wireless", os: "Android 14", weight: "190 g", price: "$399 (Launch)" },
+            { brand: "Motorola", model: "Moto G Stylus 5G (2025)", display: "6.7\" P-OLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 6 Gen 3", ram: "8 GB", storage: "256GB", main_camera: "50 MP + 13 MP", selfie_camera: "32 MP", battery: "5100 mAh", charging: "30W wired, 15W wireless", os: "Android 15", weight: "192 g", price: "$399 (Launch)" },
+            { brand: "Motorola", model: "Moto G Stylus 5G (2026)", display: "6.7\" P-OLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 6 Gen 3", ram: "8 GB", storage: "256GB", main_camera: "50 MP + 13 MP", selfie_camera: "32 MP", battery: "5200 mAh", charging: "30W wired, UFS 3.1", os: "Android 16", weight: "191 g", price: "$419 (Launch)" },
+            { brand: "Motorola", model: "Moto G Power 5G (2023)", display: "6.5\" IPS LCD, 120Hz", resolution: "1080 x 2400 pixels", processor: "Dimensity 930", ram: "4/6 GB", storage: "128GB / 256GB", main_camera: "50 MP + 2 MP + 2 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "15W wired", os: "Android 13", weight: "185 g", price: "$299 (Launch)" },
+            { brand: "Motorola", model: "Moto G Power 5G (2024)", display: "6.7\" IPS LCD, 120Hz", resolution: "1080 x 2400 pixels", processor: "Dimensity 7020", ram: "8 GB", storage: "128GB", main_camera: "50 MP + 8 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "30W wired, 15W wireless", os: "Android 14", weight: "201 g", price: "$299 (Launch)" },
+            { brand: "Motorola", model: "Moto G Power 5G (2025)", display: "6.7\" IPS LCD, 120Hz", resolution: "1080 x 2400 pixels", processor: "Dimensity 7025", ram: "8 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP", selfie_camera: "16 MP", battery: "5200 mAh", charging: "30W wired, 15W wireless", os: "Android 15", weight: "199 g", price: "$299 (Launch)" },
+            { brand: "Motorola", model: "Moto G84", display: "6.5\" P-OLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 695 5G", ram: "8/12 GB", storage: "256GB", main_camera: "50 MP + 8 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "30W wired", os: "Android 13", weight: "166 g", price: "€299 (Launch)" },
+            { brand: "Motorola", model: "Moto G85", display: "6.67\" P-OLED, 120Hz", resolution: "1080 x 2400 pixels", processor: "Snapdragon 6s Gen 3", ram: "8/12 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP", selfie_camera: "32 MP", battery: "5000 mAh", charging: "30W wired", os: "Android 14", weight: "171 g", price: "€349 (Launch)" },
+            { brand: "Motorola", model: "Moto G54", display: "6.5\" IPS LCD, 120Hz", resolution: "1080 x 2400 pixels", processor: "Dimensity 7020", ram: "4/8/12 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "15W wired", os: "Android 13", weight: "179 g", price: "€179 (Launch)" },
+            { brand: "Motorola", model: "Moto G55", display: "6.49\" IPS LCD, 120Hz", resolution: "1080 x 2400 pixels", processor: "Dimensity 7025", ram: "4/8/12 GB", storage: "128GB / 256GB", main_camera: "50 MP + 8 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "30W wired", os: "Android 14", weight: "179 g", price: "€249 (Launch)" },
+            { brand: "Motorola", model: "Moto G24", display: "6.56\" IPS LCD, 90Hz", resolution: "720 x 1612 pixels", processor: "Helio G85", ram: "4/8 GB", storage: "128GB", main_camera: "50 MP + 2 MP", selfie_camera: "8 MP", battery: "5000 mAh", charging: "15W wired", os: "Android 14", weight: "181 g", price: "€129 (Launch)" },
+            { brand: "Motorola", model: "Moto G34", display: "6.5\" IPS LCD, 120Hz", resolution: "720 x 1600 pixels", processor: "Snapdragon 695 5G", ram: "4/8 GB", storage: "64GB / 128GB", main_camera: "50 MP + 2 MP", selfie_camera: "16 MP", battery: "5000 mAh", charging: "18W wired", os: "Android 14", weight: "179 g", price: "€169 (Launch)" },
+            { brand: "Motorola", model: "Moto G Play (2024)", display: "6.5\" IPS LCD, 90Hz", resolution: "720 x 1600 pixels", processor: "Snapdragon 680 4G", ram: "4 GB", storage: "64GB", main_camera: "50 MP", selfie_camera: "8 MP", battery: "5000 mAh", charging: "15W wired", os: "Android 13", weight: "185 g", price: "$149 (Launch)" },
+            { brand: "Motorola", model: "Moto G Play (2025)", display: "6.5\" IPS LCD, 90Hz", resolution: "720 x 1600 pixels", processor: "Snapdragon 685 4G", ram: "4 GB", storage: "64GB", main_camera: "50 MP", selfie_camera: "8 MP", battery: "5100 mAh", charging: "15W wired", os: "Android 14", weight: "184 g", price: "$149 (Launch)" },
+            { brand: "Motorola", model: "Moto G Play (2026)", display: "6.7\" IPS LCD, 120Hz", resolution: "720 x 1604 pixels", processor: "Dimensity 6300 (6nm)", ram: "4 GB", storage: "64GB", main_camera: "32 MP", selfie_camera: "8 MP", battery: "5200 mAh", charging: "18W wired", os: "Android 16", weight: "202 g", price: "$159 (Launch)" },
+            { brand: "Motorola", model: "Moto G (2026)", display: "6.7\" IPS LCD, 120Hz", resolution: "720 x 1604 pixels", processor: "Dimensity 6300", ram: "4 GB", storage: "128GB", main_camera: "50 MP + 2 MP", selfie_camera: "32 MP", battery: "5200 mAh", charging: "30W wired", os: "Android 16", weight: "202 g", price: "$199 (Launch)" }
+        ];
+
+        // Core UI Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const brand1Select = document.getElementById('brand1');
+            const model1Select = document.getElementById('model1');
+            const brand2Select = document.getElementById('brand2');
+            const model2Select = document.getElementById('model2');
+            const comparisonContainer = document.getElementById('comparison-container');
+
+            let phone1Data = null;
+            let phone2Data = null;
+
+            // Extract unique brands and sort them
+            const uniqueBrands = [...new Set(phoneDatabase.map(p => p.brand))].sort();
+
+            // Populate Brand Selects
+            uniqueBrands.forEach(brand => {
+                const opt1 = document.createElement('option');
+                opt1.value = brand;
+                opt1.textContent = brand;
+                brand1Select.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = brand;
+                opt2.textContent = brand;
+                brand2Select.appendChild(opt2);
+            });
+
+            // Handle Brand 1 Change
+            brand1Select.addEventListener('change', (e) => {
+                const selectedBrand = e.target.value;
+                populateModels(selectedBrand, model1Select);
+                model1Select.disabled = false;
+                phone1Data = null; 
+                renderComparison();
+            });
+
+            // Handle Brand 2 Change
+            brand2Select.addEventListener('change', (e) => {
+                const selectedBrand = e.target.value;
+                populateModels(selectedBrand, model2Select);
+                model2Select.disabled = false;
+                phone2Data = null;
+                renderComparison();
+            });
+
+            // Handle Model 1 Change
+            model1Select.addEventListener('change', (e) => {
+                const selectedModel = e.target.value;
+                phone1Data = phoneDatabase.find(p => p.model === selectedModel);
+                renderComparison();
+            });
+
+            // Handle Model 2 Change
+            model2Select.addEventListener('change', (e) => {
+                const selectedModel = e.target.value;
+                phone2Data = phoneDatabase.find(p => p.model === selectedModel);
+                renderComparison();
+            });
+
+            // Populate models based on brand
+            function populateModels(brand, modelSelect) {
+                modelSelect.innerHTML = '<option value="" disabled selected>Select Model</option>';
+                const models = phoneDatabase.filter(p => p.brand === brand).map(p => p.model);
+                models.forEach(model => {
+                    const opt = document.createElement('option');
+                    opt.value = model;
+                    opt.textContent = model;
+                    modelSelect.appendChild(opt);
+                });
+            }
+
+            // Render Comparison Grid
+            function renderComparison() {
+                if (!phone1Data || !phone2Data) {
+                    comparisonContainer.innerHTML = `
+                        <div class="empty-state glass">
+                            ${!phone1Data && !phone2Data ? 'Select two phones from the dropdowns above to begin comparing specs.' : 'Select the other phone to see the comparison.'}
+                        </div>
+                    `;
+                    return;
+                }
+
+                comparisonContainer.innerHTML = `
+                    <div class="device-card glass glass-panel">
+                        <div class="device-header">
+                            <h3>${phone1Data.model}</h3>
+                            <span class="spec-label">${phone1Data.brand}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Display</span>
+                            <span class="spec-value">${phone1Data.display}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Resolution</span>
+                            <span class="spec-value">${phone1Data.resolution}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Processor / Chipset</span>
+                            <span class="spec-value">${phone1Data.processor}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">RAM</span>
+                            <span class="spec-value">${phone1Data.ram}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Storage Variants</span>
+                            <span class="spec-value">${phone1Data.storage}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Main Camera System</span>
+                            <span class="spec-value">${phone1Data.main_camera}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Selfie Camera</span>
+                            <span class="spec-value">${phone1Data.selfie_camera}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Battery Capacity</span>
+                            <span class="spec-value">${phone1Data.battery}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Charging</span>
+                            <span class="spec-value">${phone1Data.charging}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Operating System</span>
+                            <span class="spec-value">${phone1Data.os}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Weight</span>
+                            <span class="spec-value">${phone1Data.weight}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Base Launch Price</span>
+                            <span class="spec-value" style="color: #4ade80;">${phone1Data.price}</span>
+                        </div>
+                    </div>
+
+                    <div class="device-card glass glass-panel">
+                        <div class="device-header">
+                            <h3>${phone2Data.model}</h3>
+                            <span class="spec-label">${phone2Data.brand}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Display</span>
+                            <span class="spec-value">${phone2Data.display}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Resolution</span>
+                            <span class="spec-value">${phone2Data.resolution}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Processor / Chipset</span>
+                            <span class="spec-value">${phone2Data.processor}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">RAM</span>
+                            <span class="spec-value">${phone2Data.ram}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Storage Variants</span>
+                            <span class="spec-value">${phone2Data.storage}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Main Camera System</span>
+                            <span class="spec-value">${phone2Data.main_camera}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Selfie Camera</span>
+                            <span class="spec-value">${phone2Data.selfie_camera}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Battery Capacity</span>
+                            <span class="spec-value">${phone2Data.battery}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Charging</span>
+                            <span class="spec-value">${phone2Data.charging}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Operating System</span>
+                            <span class="spec-value">${phone2Data.os}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Weight</span>
+                            <span class="spec-value">${phone2Data.weight}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Base Launch Price</span>
+                            <span class="spec-value" style="color: #4ade80;">${phone2Data.price}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
